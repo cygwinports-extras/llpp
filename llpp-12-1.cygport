@@ -1,0 +1,44 @@
+GIT_URI="git://repo.or.cz/llpp.git"
+GIT_TAG="v${PV}"
+inherit git ocaml
+
+CATEGORY="Graphics"
+SUMMARY="PDF pager"
+DESCRIPTION="This is llpp a graphical PDF viewer which aims to superficially
+resemble less(1).  Rendering is done by the MuPDF library."
+HOMEPAGE="http://repo.or.cz/w/llpp.git"
+
+PATCH_URI="01-cygwin.patch"
+
+REQUIRES="xdg-utils xsel"
+
+# not supported with ocaml sources
+RESTRICT="debuginfo"
+
+src_compile() {
+	local ccopt="$(freetype-config --cflags) -O -include ft2build.h -D_GNU_SOURCE"
+	local cclib="-lfitz -lz -ljpeg -lopenjpeg -ljbig2dec -lfreetype -lX11 -lpthread"
+
+	lndirs
+	cd ${B}
+	# based on build.sh, but with native code compiling
+	set -x
+	${OCAML} str.cma keystoml.ml < KEYS > help.ml
+	printf 'let version ="%s";;\n' ${PV} >> help.ml
+
+	${OCAMLOPT} -c -o link.o -ccopt "$ccopt" link.c
+	${OCAMLOPT} -c -o help.cmx help.ml
+	${OCAMLOPT} -c -o wsi.cmi wsi.mli
+	${OCAMLOPT} -c -o wsi.cmx wsi.ml
+	${OCAMLOPT} -c -o parser.cmx parser.ml
+	${OCAMLOPT} -c -o main.cmx -I +lablGL main.ml
+	${OCAMLOPT} -o llpp.exe -I +lablGL str.cmxa unix.cmxa lablgl.cmxa \
+		link.o -cclib "$cclib" help.cmx parser.cmx wsi.cmx main.cmx
+	set +x
+}
+
+src_install() {
+	cd ${B}
+	dobin llpp.exe
+	dodoc KEYS Thanks
+}
