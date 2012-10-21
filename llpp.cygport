@@ -1,12 +1,14 @@
-GIT_URI="git://repo.or.cz/llpp.git"
-GIT_TAG="v${PV}"
-inherit git ocaml
-
+NAME="llpp"
+VERSION=13
+RELEASE=1
 CATEGORY="Graphics"
 SUMMARY="PDF pager"
 DESCRIPTION="This is llpp a graphical PDF viewer which aims to superficially
 resemble less(1).  Rendering is done by the MuPDF library."
 HOMEPAGE="http://repo.or.cz/w/llpp.git"
+GIT_URI="git://repo.or.cz/llpp.git"
+GIT_TAG="v${PV}"
+inherit git ocaml
 
 PATCH_URI="01-cygwin.patch"
 
