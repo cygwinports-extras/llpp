@@ -1,5 +1,5 @@
 NAME="llpp"
-VERSION=13
+VERSION=15
 RELEASE=1
 CATEGORY="Graphics"
 SUMMARY="PDF pager"
@@ -30,12 +30,13 @@ src_compile() {
 
 	${OCAMLOPT} -c -o link.o -ccopt "$ccopt" link.c
 	${OCAMLOPT} -c -o help.cmx help.ml
+	${OCAMLOPT} -c -o utils.cmo utils.ml
 	${OCAMLOPT} -c -o wsi.cmi wsi.mli
 	${OCAMLOPT} -c -o wsi.cmx wsi.ml
 	${OCAMLOPT} -c -o parser.cmx parser.ml
 	${OCAMLOPT} -c -o main.cmx -I +lablGL main.ml
 	${OCAMLOPT} -o llpp.exe -I +lablGL str.cmxa unix.cmxa lablgl.cmxa \
-		link.o -cclib "$cclib" help.cmx parser.cmx wsi.cmx main.cmx
+		link.o -cclib "$cclib" help.cmx utils.cmx parser.cmx wsi.cmx main.cmx
 	set +x
 }
 
