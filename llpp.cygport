@@ -1,13 +1,13 @@
 NAME="llpp"
 VERSION=15
-RELEASE=1
+RELEASE=2
 CATEGORY="Graphics"
 SUMMARY="PDF pager"
 DESCRIPTION="This is llpp a graphical PDF viewer which aims to superficially
 resemble less(1).  Rendering is done by the MuPDF library."
 HOMEPAGE="http://repo.or.cz/w/llpp.git"
 GIT_URI="git://repo.or.cz/llpp.git"
-GIT_TAG="v${PV}"
+GIT_TAG="v${VERSION}"
 inherit git ocaml
 
 PATCH_URI="01-cygwin.patch"
@@ -18,15 +18,16 @@ REQUIRES="xdg-utils xsel"
 RESTRICT="debuginfo"
 
 src_compile() {
-	local ccopt="$(freetype-config --cflags) -O -include ft2build.h -D_GNU_SOURCE"
-	local cclib="-lfitz -lz -ljpeg -lopenjpeg -ljbig2dec -lfreetype -lX11 -lpthread"
+	local ccopt="${CFLAGS} $(freetype-config --cflags) -include ft2build.h -D_GNU_SOURCE"
+	local cclib="-lfitz -lz -ljpeg -lopenjpeg -ljbig2dec -lfreetype -lGL -lX11"
 
 	lndirs
 	cd ${B}
 	# based on build.sh, but with native code compiling
 	set -x
-	${OCAML} str.cma keystoml.ml < KEYS > help.ml
-	printf 'let version ="%s";;\n' ${PV} >> help.ml
+	${OCAMLC} -o keystoml str.cma keystoml.ml
+	./keystoml < KEYS > help.ml
+	printf 'let version ="%s";;\n' ${VERSION} >> help.ml
 
 	${OCAMLOPT} -c -o link.o -ccopt "$ccopt" link.c
 	${OCAMLOPT} -c -o help.cmx help.ml
@@ -44,4 +45,6 @@ src_install() {
 	cd ${B}
 	dobin llpp.exe
 	dodoc KEYS Thanks
+
+	make_desktop_entry "llpp %f" llpp "" "Graphics;Viewer" "PDF viewer which resembles less" "MimeType=application/pdf;application/x-pdf;" "NoDisplay=true"
 }
