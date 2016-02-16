@@ -19,7 +19,7 @@ RESTRICT="debuginfo"
 
 src_compile() {
 	local ccopt="${CFLAGS} $(freetype-config --cflags) -include ft2build.h -D_GNU_SOURCE"
-	local cclib="-lmupdf -lz -ljpeg -lopenjp2 -ljbig2dec -lfreetype -lGL -lX11 -lcrypto"
+	local cclib="-lmupdf -lmujs -lz -ljpeg -lopenjp2 -ljbig2dec -lfreetype -lGL -lX11 -lcrypto"
 
 	lndirs
 	cd ${B}
