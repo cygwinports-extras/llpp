@@ -1,6 +1,6 @@
 NAME="llpp"
-VERSION=15
-RELEASE=2
+VERSION=22
+RELEASE=1
 CATEGORY="Graphics"
 SUMMARY="PDF pager"
 DESCRIPTION="This is llpp a graphical PDF viewer which aims to superficially
@@ -19,25 +19,28 @@ RESTRICT="debuginfo"
 
 src_compile() {
 	local ccopt="${CFLAGS} $(freetype-config --cflags) -include ft2build.h -D_GNU_SOURCE"
-	local cclib="-lfitz -lz -ljpeg -lopenjpeg -ljbig2dec -lfreetype -lGL -lX11"
+	local cclib="-lmupdf -lz -ljpeg -lopenjp2 -ljbig2dec -lfreetype -lGL -lX11 -lcrypto"
 
 	lndirs
 	cd ${B}
 	# based on build.sh, but with native code compiling
 	set -x
-	${OCAMLC} -o keystoml str.cma keystoml.ml
-	./keystoml < KEYS > help.ml
-	printf 'let version ="%s";;\n' ${VERSION} >> help.ml
+	/bin/sh mkhelp.sh KEYS "$VERSION" > help.ml
 
 	${OCAMLOPT} -c -o link.o -ccopt "$ccopt" link.c
 	${OCAMLOPT} -c -o help.cmx help.ml
-	${OCAMLOPT} -c -o utils.cmo utils.ml
+	${OCAMLOPT} -c -o utils.cmx utils.ml
 	${OCAMLOPT} -c -o wsi.cmi wsi.mli
 	${OCAMLOPT} -c -o wsi.cmx wsi.ml
 	${OCAMLOPT} -c -o parser.cmx parser.ml
+	${OCAMLOPT} -c -o config.cmx -I +lablGL config.ml
+	rm -f main.ml
+	sed -f pp.sed ${S}/main.ml > main.ml
 	${OCAMLOPT} -c -o main.cmx -I +lablGL main.ml
-	${OCAMLOPT} -o llpp.exe -I +lablGL str.cmxa unix.cmxa lablgl.cmxa \
-		link.o -cclib "$cclib" help.cmx utils.cmx parser.cmx wsi.cmx main.cmx
+	${OCAMLOPT} -o llpp.exe \
+		-I +lablGL str.cmxa unix.cmxa lablgl.cmxa \
+		link.o -cclib "$cclib" \
+		help.cmx utils.cmx parser.cmx wsi.cmx config.cmx main.cmx
 	set +x
 }
 

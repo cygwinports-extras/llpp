@@ -1,23 +1,21 @@
---- origsrc/llpp/main.ml	2012-08-21 01:42:22.000000000 -0500
-+++ src/llpp/main.ml	2012-08-21 02:33:49.626533000 -0500
-@@ -509,18 +509,16 @@ let defconf =
+--- origsrc/llpp/config.ml	2015-11-29 01:55:20.000000000 -0600
++++ src/llpp/config.ml	2015-11-29 01:57:36.284666800 -0600
+@@ -521,16 +521,14 @@ let defconf =
    ; aalevel        = 8
    ; urilauncher    =
        (match platform with
--      | Plinux | Pfreebsd | Pdragonflybsd
-+      | Plinux | Pfreebsd | Pdragonflybsd | Pcygwin
-       | Popenbsd | Pnetbsd | Psun -> "xdg-open \"%s\""
+-      | Plinux | Psun | Pbsd -> "xdg-open \"%s\""
++      | Plinux | Psun | Pbsd | Pcygwin -> "xdg-open \"%s\""
        | Posx -> "open \"%s\""
 -      | Pcygwin -> "cygstart \"%s\""
        | Punknown -> "echo %s")
    ; pathlauncher   = "lp \"%s\""
    ; selcmd         =
        (match platform with
--      | Plinux | Pfreebsd | Pdragonflybsd
-+      | Plinux | Pfreebsd | Pdragonflybsd | Pcygwin
-       | Popenbsd | Pnetbsd | Psun -> "xsel -i"
+-      | Plinux | Pbsd | Psun -> "xsel -i"
++      | Plinux | Pbsd | Psun | Pcygwin -> "xsel -i"
        | Posx -> "pbcopy"
 -      | Pcygwin -> "wsel"
        | Punknown -> "cat")
-   ; colorspace     = Rgb
-   ; invert         = false
+   ; paxcmd         = "cat"
+   ; passcmd        = E.s
